@@ -1,5 +1,6 @@
 import express from "express";
 import employees from "./db/employees.js";
+import employeesRouter from "./routes/employees.js";
 
 const app = express();
 
@@ -19,21 +20,13 @@ app.get("/employees/random", (req, res) => {
   res.json(employees[randomIndex]);
 });
 
-// Get all employees
-app.get("/employees", (req, res) => {
-  res.json(employees);
-});
+// Use employees router
+app.use("/employees", employeesRouter);
 
-// Get employee by ID
-app.get("/employees/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const employee = employees.find((emp) => emp.id === id);
-
-  if (!employee) {
-    return res.status(404).json({ error: "Employee not found" });
-  }
-
-  res.json(employee);
+// Catch-all error-handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 export default app;
